@@ -84,6 +84,7 @@ router.post('/orderup', async (req, res) => {
  */
 router.post('/inhosadd', async (req, res) => {
   let { ihNum, idCard, hNum, isInHos, inHosDay, drug, exam } = req.body
+  const clearInfo = await querySql(`select r.uName, h.hName from trecord as r inner join thospital as h where r.idCard = '${idCard}' and h.hNum = '${hNum}'`)
   let inHosMoney = 0
   let allExamMon = 0
   let drugPrice = 0
@@ -121,9 +122,17 @@ router.post('/inhosadd', async (req, res) => {
       msg: '添加失败'
     })
   } else {
+    // 区块链
+    const inhospitalApp = {
+      "ihNum": `'${ihNum}'`,
+      "idName": `'${clearInfo[0].uName}'`,
+      "hName": `'${clearInfo[0].hName}'`,
+      "ihMoney": `${allMoney.toFixed(2)}`
+    }
     res.json({
       statusCode: 0,
-      msg: '添加成功'
+      msg: '添加成功',
+      inhospitalApp
     })
   }
 })
@@ -133,7 +142,7 @@ router.post('/inhosadd', async (req, res) => {
  */
 router.get('/ordername', async (req, res) => {
   const { name } = url.parse(req.url, true).query
-  const order = await querySql(`SELECT i.*, r.uName, h.hName FROM trecord AS r INNER JOIN thospital AS h INNER JOIN tinhospital AS i WHERE i.idCard = r.idCard AND r.uName like '%${name}%'`)
+  const order = await querySql(`SELECT i.*, r.uName, h.hName FROM trecord AS r INNER JOIN thospital AS h INNER JOIN tinhospital AS i WHERE i.idCard = r.idCard AND h.hNum = i.hNum AND r.uName like '%${name}%'`)
 
   for (let i = 0; i < order.length; i++) {
     let exam = await querySql(`SELECT ex.*, e.eName FROM texamine AS e INNER JOIN texamde AS ex WHERE e.eNum = ex.eNum AND ex.ihNum = '${order[i].ihNum}'`)

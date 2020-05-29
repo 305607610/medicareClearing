@@ -156,6 +156,7 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       users: [],
       query: '',
       total: 0,
@@ -263,7 +264,8 @@ export default {
       } else {
         user.role = '2'
       }
-      this.upForm = user
+      this.upForm.username = user.username
+      this.upForm.role = user.role
     },
     deleteUser(user) {
       if (user.username === 'admin') {

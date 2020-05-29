@@ -11,7 +11,7 @@
           <el-input placeholder="请输入内容" v-model="query" class="query" clearable @clear="getDrug">
             <el-button slot="append" icon="el-icon-search" @click="getDrugLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddDrug = true" plain>添加药品</el-button>
+          <el-button type="success" @click="dialogAddDrug = true" plain v-if="role === '1'">添加药品</el-button>
         </el-col>
       </el-row>
       <el-table :data="drug" stripe style="width: 100%">
@@ -26,7 +26,7 @@
         <el-table-column align="center" prop="madePe" label="生产厂家"></el-table-column>
         <el-table-column align="center" prop="madeDate" label="生产日期"></el-table-column>
         <el-table-column align="center" prop="dFunction" label="功能主治"></el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="updateDrug(scope.row)"
@@ -190,6 +190,7 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       query: '',
       imageUrl: '',
       imgPath: '',

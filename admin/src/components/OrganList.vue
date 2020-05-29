@@ -11,7 +11,7 @@
           <el-input placeholder="请输入内容" v-model="query" class="query" clearable @clear="getInsu">
             <el-button slot="append" icon="el-icon-search" @click="getInsuLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddInsu = true" plain>添加机构</el-button>
+          <el-button type="success" @click="dialogAddInsu = true" plain v-if="role === '1'">添加机构</el-button>
         </el-col>
       </el-row>
       <el-table :data="insu" stripe style="width: 100%">
@@ -25,7 +25,7 @@
         </el-table-column>
         <el-table-column align="center" prop="inHosBao" label="住院报销率"></el-table-column>
         <el-table-column align="center" prop="noHosBao" label="未住院报销率"></el-table-column>\
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="updateInsu(scope.row)"
@@ -131,6 +131,7 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       query: '',
       dialogAddInsu: false,
       dialogUpInsu: false,

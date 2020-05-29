@@ -28,6 +28,7 @@ export default {
   name: 'Login',
   data() {
     return {
+      name: '',
       formData: {
         username: 'admin',
         password: 'admin'
@@ -56,13 +57,25 @@ export default {
           if (res.statusCode === 0 && res.login[0].status === 1) {
             localStorage.setItem('token', res.token)
             localStorage.setItem('name', this.formData.username)
-            await this.$router.push({ path: '/' })
+            if (this.formData.username === 'admin') {
+              localStorage.setItem('role', '1')
+              await this.$router.push({ path: '/' })
+            } else {
+              this.getName(this.formData.username)
+              localStorage.setItem('role', '2')
+              await this.$router.push({ path: 'patientlist' })
+            }
             this.$message.success('登录成功')
           } else {
             this.$message.error('登录失败')
           }
         }
       })
+    },
+    async getName(username) {
+      const { data: res } = await this._http.get(`patient/patientname?username=${username}`)
+      this.name = res.uName
+      localStorage.setItem('uName', this.name[0].uName)
     },
     resetData(formData) {
       this.$refs[formData].resetFields()

@@ -11,7 +11,7 @@
           <el-input placeholder="请输入内容" v-model="query" class="query" clearable @clear="getExamine">
             <el-button slot="append" icon="el-icon-search" @click="getExamineLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddExamine = true" plain>添加检查</el-button>
+          <el-button type="success" @click="dialogAddExamine = true" plain v-if="role === '1'">添加检查</el-button>
         </el-col>
       </el-row>
       <el-table :data="examine" stripe style="width: 100%">
@@ -23,7 +23,7 @@
             <span>{{scope.row.ePrice | rounding}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="updateExamine(scope.row)"
@@ -119,6 +119,7 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       query: '',
       dialogAddExamine: false,
       dialogUpExamine: false,

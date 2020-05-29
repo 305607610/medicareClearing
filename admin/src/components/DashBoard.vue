@@ -6,6 +6,12 @@
       <el-breadcrumb-item>活动列表</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="box-card">
+      <div class="list-container">
+        <el-card class="list-card">das</el-card>
+        <el-card class="list-card">das</el-card>
+        <el-card class="list-card">das</el-card>
+        <el-card class="list-card">das</el-card>
+      </div>
       <div id="main" style="width: 600px;height:400px;"></div>
     </el-card>
   </div>
@@ -51,5 +57,18 @@ export default {
   margin-top: 20px;
   /* height: 96%; */
   min-height: 96%;
+}
+.list-container {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  justify-content: space-around;
+}
+.list-card:hover {
+  background-color: #f00;
+}
+.list-card {
+  width: 23%;
+  height: 200px;
 }
 </style>

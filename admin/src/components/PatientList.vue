@@ -11,7 +11,7 @@
           <el-input placeholder="请输入内容" v-model="query" class="query" clearable @clear="getPatient">
             <el-button slot="append" icon="el-icon-search" @click="getPatientLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddPatient = true" plain>添加患者</el-button>
+          <el-button type="success" @click="dialogAddPatient = true" plain v-if="role === '1'">添加患者</el-button>
         </el-col>
       </el-row>
       <el-table :data="patient" stripe style="width: 100%">
@@ -24,6 +24,22 @@
         <el-table-column align="center" prop="telphone" label="电话"></el-table-column>
         <el-table-column label="操作" align="center">
           <template v-slot="scope">
+            <el-tooltip
+              class="item"
+              effect="light"
+              content="授予登录权限"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                @click="addLogin(scope.row)"
+                type="warning"
+                icon="el-icon-star-off"
+                circle
+                plain
+                v-if="role === '1'"
+              ></el-button>
+            </el-tooltip>
             <el-button
               @click="updatePatient(scope.row)"
               type="primary"
@@ -37,6 +53,7 @@
               icon="el-icon-delete"
               circle
               plain
+              v-if="role === '1'"
             ></el-button>
           </template>
         </el-table-column>
@@ -115,6 +132,37 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeAddDis()">取 消</el-button>
         <el-button type="primary" @click="addPatient('addForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 添加用户登录对话框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogAddUser" @close="closeAddUserDis()">
+      <el-form :model="userForm" ref="userForm" :rules="rules" status-icon>
+        <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
+          <el-input v-model="userForm.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
+          <el-input
+            type="password"
+            clearable
+            show-password
+            v-model="userForm.password"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="password2" :label-width="formLabelWidth">
+          <el-input
+            type="password"
+            clearable
+            show-password
+            v-model="userForm.password2"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeAddUserDis()">取 消</el-button>
+        <el-button type="primary" @click="addUser('userForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -198,13 +246,17 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
+      uName: localStorage.getItem('uName'),
       query: '',
       dialogAddPatient: false,
       dialogUpPatient: false,
+      dialogAddUser: false,
       patient: [],
       addForm: {
         sex: '男'
       },
+      userForm: {},
       uploadData: {},
       formLabelWidth: '120px',
       value: '',
@@ -254,13 +306,24 @@ export default {
   created() {
     this.getPatient()
   },
+  // mounted() {
+  //   this.getPatient()
+  // },
   methods: {
     async getPatient() {
-      const { data: res } = await this._http.get(
-        `patient/patientlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
-      )
-      this.patient = res.patient
-      this.total = res.num
+      if (this.uName === null || this.uName === '') {
+        const { data: res } = await this._http.get(
+          `patient/patientlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
+        )
+        this.patient = res.patient
+        this.total = res.num
+      } else {
+        const { data: res } = await this._http.get(
+          `patient/patientlistname?uName=${this.uName}`
+        )
+        this.patient = res.patient
+        this.total = res.patient.length
+      }
     },
     addPatient(patient) {
       this.$refs[patient].validate(async valid => {
@@ -273,6 +336,29 @@ export default {
           if (res.statusCode === 0) {
             this.$message.success('添加成功')
             this.dialogAddPatient = false
+            this.addForm = {}
+            this.getPatient()
+          } else {
+            this.$message.error('添加失败')
+          }
+        }
+      })
+    },
+    addLogin(patient) {
+      this.dialogAddUser = true
+      this.userForm.idCard = patient.idCard
+    },
+    addUser(user) {
+      this.$refs[user].validate(async valid => {
+        if (valid) {
+          console.log(this.userForm)
+          const { data: res } = await this._http.post(
+            'patient/useradd',
+            this.userForm
+          )
+          if (res.statusCode === 0) {
+            this.dialogAddUser = false
+            this.$message.success('添加成功')
             this.addForm = {}
             this.getPatient()
           } else {

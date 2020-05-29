@@ -59,13 +59,22 @@ router.post('/toPay', async (req, res) => {
   const patient = await querySql(`select * from trecord where idCard='${idCard}'`)
   const insu = await querySql(`select * from tinsurance where iNum='${iNum}'`)
   const iCard = await querySql(`select * from tinsucard where icNum='${icNum}'`)
-  if(iCard[0].inStatus === 0){
+  if (iCard[0].inStatus === 0) {
     const iCard = await querySql(`update tinsucard set inStatus=1, inMoney=${insu[0].biMoney}, inDate='${(new Date()).toLocaleString()}' where icNum='${icNum}'`)
+    // 区块链
+    const insuCardApp = {
+      "icNum": `'${icNum}'`,
+      "idName": `'${patient[0].uName}'`,
+      "iName": `'${insu[0].iName}'`,
+      "inMoney": `${insu[0].biMoney.toFixed(2)}`
+    }
+    
     res.json({
       statusCode: 0,
-      msg: '支付成功'
-    })
-  } else{
+      msg: '支付成功',
+      insuCardApp
+    })    
+  } else {
     res.json({
       statusCode: -1,
       msg: '已支付'

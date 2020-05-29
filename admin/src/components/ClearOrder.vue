@@ -3,7 +3,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>报销管理</el-breadcrumb-item>
-      <el-breadcrumb-item>费用结算</el-breadcrumb-item>
+      <el-breadcrumb-item>清算信息</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="box-card">
       <el-row>
@@ -102,13 +102,13 @@
         </el-table-column>
         <el-table-column align="center" width="175px" label="备注">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.remark.substr(0,1) === '1'" type="success">住院</el-tag>
-            <el-tag v-else type="danger">未住院</el-tag>&nbsp;
             <el-tag v-if="scope.row.remark.substr(1,2) === '1'" type="success">已参保</el-tag>
-            <el-tag v-else type="danger">未参保</el-tag>
+            <el-tag v-else type="danger">未参保</el-tag>&nbsp;
+            <el-tag v-if="scope.row.remark.substr(0,1) === '1'" type="success">住院</el-tag>
+            <el-tag v-else type="danger">未住院</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="deleteClear(scope.row)"
@@ -143,7 +143,9 @@ export default {
   },
   data() {
     return {
+      role: localStorage.getItem('role'),
       query: '',
+      uName: localStorage.getItem('uName'),
       imageUrl: '',
       imgPath: '',
       dialogAddClear: false,
@@ -168,11 +170,19 @@ export default {
   },
   methods: {
     async getClear() {
-      const { data: res } = await this._http.get(
-        `clear/clearorder?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
-      )
-      this.clear = res.clear
-      this.total = res.num
+      if (this.uName === '' || this.uName === null) {
+        const { data: res } = await this._http.get(
+          `clear/clearorder?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
+        )
+        this.clear = res.clear
+        this.total = res.num
+      } else {
+        const { data: res } = await this._http.get(
+          `clear/clearname?name=${this.uName}`
+        )
+        this.clear = res.clear
+        this.total = res.clear.length
+      }
     },
     async getPatient() {
       const { data: res } = await this._http.get('patient/allpatient')
@@ -188,7 +198,7 @@ export default {
         return
       }
       const { data: res } = await this._http.get(
-        `inhospital/clearname?name=${this.query}`
+        `clear/clearname?name=${this.query}`
       )
       if (res.statusCode === 0) {
         this.clear = res.clear
@@ -203,17 +213,8 @@ export default {
       this.queryInfo.pageNum = newPage
       this.getClear()
     },
-    async toPay(clear) {
-      const { data: res } = await this._http.post('clearclear/toPay', clear)
-      if (res.statusCode === 0) {
-        this.$message.success('结算成功')
-      } else {
-        this.$message.error('已结算')
-      }
-      this.getClear()
-    },
     deleteClear(clear) {
-      this.$confirm(`确定要删除${clear.uName}吗？`, '提示', {
+      this.$confirm(`确定要删除${clear.idName}吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

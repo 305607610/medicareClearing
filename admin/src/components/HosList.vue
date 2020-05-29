@@ -17,7 +17,7 @@
           >
             <el-button slot="append" icon="el-icon-search" @click="getHospitalLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddHospital = true" plain>添加医院</el-button>
+          <el-button type="success" @click="dialogAddHospital = true" plain v-if="role === '1'">添加医院</el-button>
         </el-col>
       </el-row>
       <el-table :data="hospital" stripe style="width: 100%">
@@ -31,7 +31,7 @@
             <span>{{scope.row.inhMoney | rounding}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="updateHospital(scope.row)"
@@ -137,6 +137,7 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       query: '',
       dialogAddHospital: false,
       dialogUpHospital: false,

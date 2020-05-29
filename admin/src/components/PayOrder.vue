@@ -67,15 +67,9 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="ihNum" width="220px" label="费用单编号"></el-table-column>
+        <!-- <el-table-column align="center" prop="ihNum" width="220px" label="费用单编号"></el-table-column> -->
         <el-table-column align="center" prop="uName" label="患者"></el-table-column>
         <el-table-column align="center" prop="hName" label="医院"></el-table-column>
-        <el-table-column align="center" prop="isClear" label="结算状态">
-          <template v-slot="scope">
-            <el-tag v-if="scope.row.isClear === 1" type="success">已结算</el-tag>
-            <el-tag v-else type="danger">未结算</el-tag>
-          </template>
-        </el-table-column>
         <el-table-column align="center" prop="drugMoney" label="药品费用">
           <template v-slot="scope">
             <span>{{ scope.row.drugMoney | rounding }}</span>
@@ -96,6 +90,12 @@
             <span>{{ scope.row.allMoney | rounding }}</span>
           </template>
         </el-table-column>
+        <el-table-column align="center" prop="isClear" label="结算状态">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.isClear === 1" type="success">已结算</el-tag>
+            <el-tag v-else type="danger">未结算</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center">
           <template v-slot="scope">
             <el-tooltip class="item" effect="light" content="结算" :enterable="false" placement="top">
@@ -107,6 +107,7 @@
               icon="el-icon-delete"
               circle
               plain
+              v-if="role === '1'"
             ></el-button>
           </template>
         </el-table-column>
@@ -134,7 +135,9 @@ export default {
   },
   data() {
     return {
+      role: localStorage.getItem('role'),
       query: '',
+      uName: localStorage.getItem('uName'),
       imageUrl: '',
       imgPath: '',
       dialogAddOrder: false,
@@ -159,11 +162,19 @@ export default {
   },
   methods: {
     async getOrder() {
-      const { data: res } = await this._http.get(
-        `inhospital/orderlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
-      )
-      this.order = res.order
-      this.total = res.num
+      if (this.uName === '' || this.uName === null) {
+        const { data: res } = await this._http.get(
+          `inhospital/orderlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
+        )
+        this.order = res.order
+        this.total = res.num
+      } else {
+        const { data: res } = await this._http.get(
+          `inhospital/ordername?name=${this.uName}`
+        )
+        this.order = res.order
+        this.total = res.order.length
+      }
     },
     async getPatient() {
       const { data: res } = await this._http.get('patient/allpatient')
@@ -198,10 +209,14 @@ export default {
       const { data: res } = await this._http.post('clear/toPay', order)
       if (res.statusCode === 0) {
         this.$message.success('结算成功')
+        this.getOrder()
+        await this.axios.post(
+          'http://192.168.159.159:3000/api/clear',
+          res.clearApp
+        )
       } else {
         this.$message.error('已结算')
       }
-      this.getOrder()
     },
     deleteOrder(order) {
       this.$confirm(`确定要删除${order.uName}吗？`, '提示', {

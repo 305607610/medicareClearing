@@ -3,6 +3,7 @@ const { querySql } = require('../db/index')
 const url = require('url')
 const jwt = require('jsonwebtoken')
 const { PRIVATE_KEY, JWT_EXPIRED } = require('../utils/constant')
+const md5 = require('md5-node')
 
 const router = express.Router()
 
@@ -11,7 +12,7 @@ const router = express.Router()
  */
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
-  const login = await querySql(`select * from tuser where username = '${username}' and password = '${password}'`)
+  const login = await querySql(`select * from tuser where username = '${username}' and password = '${md5(password)}'`)
   if (!login || login.length === 0) {
     res.json({
       statusCode: -1,
@@ -37,9 +38,10 @@ router.post('/login', async (req, res) => {
  */
 router.post('/userlistadd', async (req, res) => {
   const { username, password } = req.body
+  
   let role = 2
   let status = 0
-  const user = await querySql(`insert into tuser values ('${username}', '${password}', ${role}, ${status})`)
+  const user = await querySql(`insert into tuser values ('${username}', '${md5(password)}', ${role}, ${status})`)
   if (!user) {
     res.json({
       statusCode: -1,

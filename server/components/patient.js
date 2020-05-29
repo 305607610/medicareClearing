@@ -2,6 +2,7 @@ const express = require('express')
 const { querySql } = require('../db/index')
 const url = require('url')
 const jwt = require('jsonwebtoken')
+const md5 = require('md5-node')
 const { PRIVATE_KEY, JWT_EXPIRED } = require('../utils/constant')
 
 const router = express.Router()
@@ -45,6 +46,29 @@ router.get('/allpatient', async (req, res) => {
       statusCode: 0,
       msg: '查询成功',
       patient
+    })
+  }
+})
+
+/**
+ * 添加用户登录
+ */
+router.post('/useradd', async (req, res) => {
+  const { idCard, username, password } = req.body
+  
+  let role = 2
+  let status = 0
+  const user = await querySql(`insert into tuser values ('${username}', '${md5(password)}', ${role}, ${status})`)
+  await querySql(`update trecord set username='${username}' where idCard='${idCard}'`)
+  if (!user) {
+    res.json({
+      statusCode: -1,
+      msg: '添加失败'
+    })
+  } else {
+    res.json({
+      statusCode: 0,
+      msg: '添加成功'
     })
   }
 })
@@ -124,6 +148,26 @@ router.get('/patientlistname', async (req, res) => {
       msg: '查询成功',
       patient,
       num: patient.length
+    })
+  }
+})
+
+/**
+ * 用户名查询姓名
+ */
+router.get('/patientname', async (req, res) => {
+  const { username } = url.parse(req.url, true).query
+  const uName = await querySql(`select uName from trecord where username = '${username}'`)
+  if (!uName || uName.length === 0) {
+    res.json({
+      statusCode: -1,
+      msg: '没有查询到信息'
+    })
+  } else {
+    res.json({
+      statusCode: 0,
+      msg: '查询成功',
+      uName,
     })
   }
 })

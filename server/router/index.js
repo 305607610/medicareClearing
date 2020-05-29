@@ -15,6 +15,8 @@ const UploadRouter = require('../uploads/upload')
 
 const router = express.Router()
 
+// const logger = require('../config/logConfig').logger('index.js', 'warn')
+
 // router.use(jwtAuth)
 
 router.get('/' ,(req, res) => {

@@ -142,6 +142,7 @@ export default {
   },
   data() {
     return {
+      role: localStorage.getItem('role'),
       active: '0',
       addForm: {},
       patient: [],
@@ -203,7 +204,7 @@ export default {
       if (this.active !== '0') {
         if (!this.addForm.idCard || !this.addForm.hNum) {
           this.$message.warning('请填写基本信息')
-          return
+          return false
         }
       }
       this.query = ''
@@ -232,7 +233,7 @@ export default {
             this.addForm = {}
             this.getDrug()
             this.getExamine()
-            await this.$router.push({ path: '/payorder' })
+            await this.axios.post('http://192.168.159.159:3000/api/inhospital', res.inhospitalApp)
           } else {
             this.$message.error('录入失败')
           }

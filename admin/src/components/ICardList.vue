@@ -3,7 +3,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>医保管理</el-breadcrumb-item>
-      <el-breadcrumb-item>医保卡管理</el-breadcrumb-item>
+      <el-breadcrumb-item>缴费管理</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="box-card">
       <el-row>
@@ -11,7 +11,7 @@
           <el-input placeholder="请输入内容" v-model="query" class="query" clearable @clear="getICard">
             <el-button slot="append" icon="el-icon-search" @click="getICardLikeName"></el-button>
           </el-input>
-          <el-button type="success" @click="dialogAddICard = true" plain>添加医保卡</el-button>
+          <el-button type="success" @click="dialogAddICard = true" plain v-if="role === '1'">添加信息</el-button>
         </el-col>
       </el-row>
       <el-table :data="iCard" stripe style="width: 100%">
@@ -47,6 +47,7 @@
               icon="el-icon-edit"
               circle
               plain
+              v-if="role === '1'"
             ></el-button>
             <el-button
               @click="deleteICard(scope.row)"
@@ -54,6 +55,7 @@
               icon="el-icon-delete"
               circle
               plain
+              v-if="role === '1'"
             ></el-button>
           </template>
         </el-table-column>
@@ -71,7 +73,7 @@
     </el-card>
 
     <!-- 添加对话框 -->
-    <el-dialog title="添加医保卡" :visible.sync="dialogAddICard" @close="closeAddDis">
+    <el-dialog title="添加信息" :visible.sync="dialogAddICard" @close="closeAddDis">
       <el-form :model="addForm" ref="addForm" :rules="rules" status-icon>
         <el-form-item label="姓名" prop="idCard" :label-width="formLabelWidth">
           <el-select v-model="addForm.idCard" placeholder="请选择">
@@ -96,7 +98,7 @@
     </el-dialog>
 
     <!-- 修改对话框 -->
-    <el-dialog title="修改医保卡信息" :visible.sync="dialogUpICard" @close="closeUpDis">
+    <el-dialog title="修改信息" :visible.sync="dialogUpICard" @close="closeUpDis">
       <el-form :model="addForm" ref="addForm" :rules="rules" status-icon>
         <el-form-item label="姓名" prop="idCard" :label-width="formLabelWidth">
           <el-select v-model="addForm.idCard" placeholder="请选择">
@@ -143,7 +145,9 @@ export default {
       }
     }
     return {
+      role: localStorage.getItem('role'),
       query: '',
+      uName: localStorage.getItem('uName'),
       dialogAddICard: false,
       dialogUpICard: false,
       iCard: [],
@@ -169,11 +173,19 @@ export default {
   },
   methods: {
     async getICard() {
-      const { data: res } = await this._http.get(
-        `iCard/iCardlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
-      )
-      this.iCard = res.iCard
-      this.total = res.num
+      if (this.uName === '' || this.uName === null) {
+        const { data: res } = await this._http.get(
+          `iCard/iCardlist?pageNum=${this.queryInfo.pageNum}&pageSize=${this.queryInfo.pageSize}`
+        )
+        this.iCard = res.iCard
+        this.total = res.num
+      } else {
+        const { data: res } = await this._http.get(
+          `iCard/iCardlistname?idName=${this.uName}`
+        )
+        this.iCard = res.iCard
+        this.total = res.iCard.length
+      }
     },
     async getPatient() {
       const { data: res } = await this._http.get('patient/allpatient')
@@ -188,6 +200,10 @@ export default {
       if (res.statusCode === 0) {
         this.$message.success('支付成功')
         this.getICard()
+        await this.axios.post(
+          'http://192.168.159.159:3000/api/insuCard',
+          res.insuCardApp
+        )
       } else {
         this.$message.error('已支付')
       }
