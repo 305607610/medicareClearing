@@ -7,6 +7,9 @@ import VueAxios from 'vue-axios'
 import 'element-ui/lib/theme-chalk/index.css'
 import http from './router/http.js'
 import UUID from 'vue-uuid'
+import echarts from 'echarts'
+
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 

@@ -63,7 +63,7 @@ router.post('/toPay', async (req, res) => {
 
     myMon = order.allMoney - clearMon
     let remark = '' + order.isInHos + info[0].inStatus
-    const clear = await querySql(`insert into tclear values ('${cNum}', '${order.ihNum}', '${info[0].icNum}', ${order.allMoney}, ${clearMon}, ${myMon}, '${remark}')`)
+    const clear = await querySql(`insert into tclear values ('${cNum}', '${order.ihNum}', '${info[0].icNum}', ${order.allMoney}, ${clearMon}, ${myMon}, '${remark}', '${(new Date()).toLocaleString()}')`)
     await querySql(`update tinhospital set isClear = 1 where ihNum = '${order.ihNum}'`)
     if (!clear || clear.length === 0) {
       res.json({

@@ -115,7 +115,7 @@ router.post('/inhosadd', async (req, res) => {
     allExamMon += examPrice
   }
   allMoney = allDrugMon + allExamMon + inHosMoney
-  await querySql(`update tinhospital set inHosMon=${inHosMoney}, drugMoney=${allDrugMon}, texaMoney=${allExamMon}, allMoney=${allMoney} where ihNum='${ihNum}'`)
+  await querySql(`update tinhospital set inHosMon=${inHosMoney}, drugMoney=${allDrugMon}, texaMoney=${allExamMon}, allMoney=${allMoney}, ihDate='${(new Date()).toLocaleString()}' where ihNum='${ihNum}'`)
   if (!info) {
     res.json({
       statusCode: -1,

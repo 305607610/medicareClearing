@@ -9,6 +9,7 @@ const DrugRouter = require('../components/drug')
 const ExamineRouter = require('../components/examine')
 const InhosRouter = require('../components/inhospital')
 const ClearRouter = require('../components/clearOrder')
+const DashboardRouter = require('../components/dashboard')
 const jwtAuth = require('./jwt')
 const {CODE_ERROR} = require('../utils/constant')
 const UploadRouter = require('../uploads/upload')
@@ -33,6 +34,7 @@ router.use('/drug', DrugRouter)
 router.use('/examine', ExamineRouter)
 router.use('/inhospital', InhosRouter)
 router.use('/clear', ClearRouter)
+router.use('/dashboard', DashboardRouter)
 
 /**
  * 处理404
