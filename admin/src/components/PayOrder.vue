@@ -210,10 +210,7 @@ export default {
       if (res.statusCode === 0) {
         this.$message.success('结算成功')
         this.getOrder()
-        await this.axios.post(
-          'http://192.168.159.159:3000/api/clear',
-          res.clearApp
-        )
+        await this._ubuntu.post('clear', res.clearApp)
       } else {
         this.$message.error('已结算')
       }

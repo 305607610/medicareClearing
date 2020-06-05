@@ -200,10 +200,7 @@ export default {
       if (res.statusCode === 0) {
         this.$message.success('支付成功')
         this.getICard()
-        await this.axios.post(
-          'http://192.168.159.159:3000/api/insuCard',
-          res.insuCardApp
-        )
+        await this._ubuntu.post('insuCard', res.insuCardApp)
       } else {
         this.$message.error('已支付')
       }

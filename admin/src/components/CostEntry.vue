@@ -233,7 +233,7 @@ export default {
             this.addForm = {}
             this.getDrug()
             this.getExamine()
-            await this.axios.post('http://192.168.159.159:3000/api/inhospital', res.inhospitalApp)
+            await this._ubuntu.post('inhospital', res.inhospitalApp)
           } else {
             this.$message.error('录入失败')
           }

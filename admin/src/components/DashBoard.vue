@@ -28,7 +28,7 @@
           <br />
           <div class="word">总金额</div>
         </el-card>
-        <el-card style="background-image: linear-gradient(#d3f4ff, #b2dffb);">
+        <el-card style="background-image: linear-gradient(#b2ebf2, #00bcd4);">
           <div class="num" style="color:#7e0cf5;">{{clearMoney | rounding}}</div>
           <br />
           <div class="word">报销金额</div>
@@ -45,7 +45,7 @@
         </el-card>
       </div>
 
-      <el-tabs type="card" v-model="active">
+      <el-tabs type="card" @tab-click="handleClick" v-model="active">
         <el-tab-pane label="报销汇总" name="0">
           <div id="qingsuan" style="width: 80vw;height:500px;margin-top:20px"></div>
         </el-tab-pane>
@@ -78,7 +78,7 @@ export default {
   },
   mounted() {
     this.getMoneyList()
-    this.getOrderList()
+    // this.getOrderList()
   },
   created() {
     this.getAllMoney()
@@ -108,6 +108,14 @@ export default {
       const { data: res } = await this._http.get('dashboard/allmoney')
       this.allMoney = res.allMoney
       this.clearMoney = res.clearMoney
+    },
+    handleClick() {
+      if (this.active === '0') {
+        this.getMoneyList()
+      }
+      if (this.active === '1') {
+        this.getOrderList()
+      }
     },
     async getMoneyList() {
       const qingsuan = echarts.init(document.getElementById('qingsuan'))
