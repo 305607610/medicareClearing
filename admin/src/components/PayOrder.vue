@@ -101,14 +101,14 @@
             <el-tooltip class="item" effect="light" content="结算" :enterable="false" placement="top">
               <el-button @click="toPay(scope.row)" type="success" icon="el-icon-check" circle plain></el-button>
             </el-tooltip>
-            <el-button
+            <!-- <el-button
               @click="deleteOrder(scope.row)"
               type="danger"
               icon="el-icon-delete"
               circle
               plain
               v-if="role === '1'"
-            ></el-button>
+            ></el-button> -->
           </template>
         </el-table-column>
       </el-table>

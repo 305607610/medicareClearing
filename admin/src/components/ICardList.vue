@@ -41,7 +41,7 @@
             <el-tooltip class="item" effect="light" content="缴费" :enterable="false" placement="top">
               <el-button @click="toPay(scope.row)" type="success" icon="el-icon-check" circle plain></el-button>
             </el-tooltip>
-            <el-button
+            <!-- <el-button
               @click="updateICard(scope.row)"
               type="primary"
               icon="el-icon-edit"
@@ -56,7 +56,7 @@
               circle
               plain
               v-if="role === '1'"
-            ></el-button>
+            ></el-button> -->
           </template>
         </el-table-column>
       </el-table>

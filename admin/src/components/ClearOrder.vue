@@ -108,7 +108,7 @@
             <el-tag v-else type="danger">未住院</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" v-if="role === '1'">
+        <!-- <el-table-column label="操作" align="center" v-if="role === '1'">
           <template v-slot="scope">
             <el-button
               @click="deleteClear(scope.row)"
@@ -118,7 +118,7 @@
               plain
             ></el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
       <el-pagination
         @size-change="handleSizeChange"
